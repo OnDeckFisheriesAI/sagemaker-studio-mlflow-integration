@@ -21,7 +21,6 @@ export class AmplifyMlflowStack extends cdk.Stack {
     cognitoUserPool: cognito.UserPool,
     cognitoIdentityPool: IdentityPool,
     cognitoUserPoolClient: cognito.UserPoolClient,
-    sagemakerStudioDomainId: string,
     props?: cdk.StackProps
   ) {
     super(scope, id, props);
@@ -31,13 +30,6 @@ export class AmplifyMlflowStack extends cdk.Stack {
         description: 'MLflow v2.5.0 with cognito patch', // optional property
         code: codecommit.Code.fromDirectory('../mlflow/mlflow/server/js', 'main')
     });
-
-    const AccessControlAllowOriginHeader: amplify.CustomResponseHeader = {
-        headers: {
-            'Access-Control-Allow-Origin': `https://${sagemakerStudioDomainId}.studio.${this.region}.sagemaker.aws`,
-        },
-        pattern: '*',
-    };
 
     const amplifyApp = new amplify.App(this, 'Mlflow-UI', {
         sourceCodeProvider: new amplify.CodeCommitSourceCodeProvider({ repository: repo }),
@@ -84,7 +76,7 @@ export class AmplifyMlflowStack extends cdk.Stack {
             'AMPLIFY_IDENTITYPOOL_ID': cognitoIdentityPool.identityPoolId, 
             'REACT_APP_COGNITO_USER_POOL_CLIENT_ID': cognitoUserPoolClient.userPoolClientId
         },
-        customResponseHeaders: [AccessControlAllowOriginHeader]
+        customResponseHeaders: []
     })
     
     amplifyApp.addBranch('main')
